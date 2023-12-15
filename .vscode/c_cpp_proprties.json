@@ -1,0 +1,11 @@
+{
+    "configuration": [
+        {
+            "includePath": [
+                "./lib",
+                "./include"
+            ]
+        }
+    ],
+    "version": "2.0.0"
+}
