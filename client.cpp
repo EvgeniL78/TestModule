@@ -47,7 +47,7 @@ void onConnect(void* context, MQTTAsync_successData*)
 	opts.context = client;
 	auto subscr {
 		[&](const string_view& topic) {
-			printf("Subscribing to topic %s\nfor client %s using QoS%d\n", topic, CLIENTID, QOS);
+			printf("Subscribing to topic %s\nfor client %s using QoS%d\n", topic.data(), CLIENTID, QOS);
 			int rc{};			   
 			if ((rc = MQTTAsync_subscribe(client, topic.data(), QOS, &opts)) != MQTTASYNC_SUCCESS)
 			{
@@ -215,7 +215,7 @@ void onSend(void* context, MQTTAsync_successData* response)
 	printf("Message with token value %d delivery confirmed\n", response->token);
 }
 
-void Client::Publish(const std::string_view topic, const std::string_view msg)
+void Client::Publish(const std::string& topic, const std::string& msg)
 {
 	MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
 	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
@@ -233,7 +233,7 @@ void Client::Publish(const std::string_view topic, const std::string_view msg)
 		printf("Failed to start sendMessage, return code %d\n", rc);
 		throw false;
 	}
-	printf("Waiting for publication on topic %s\n", topic);			
+	printf("Waiting for publication on topic %s\n", topic.data());			
 }
 
 

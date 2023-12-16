@@ -2,6 +2,9 @@
 #include <OsWrapper.h>
 #endif
 #include <iostream>
+#include <unistd.h>
+#include <termios.h>
+#include <sys/ioctl.h>
 #include <memory>
 #include <map>
 
@@ -19,6 +22,27 @@ void PrintCurrAutomatState(shared_ptr<Automat> a)
 {
 	cout << a->GetStateMsg() << endl;
 }
+
+  /// \brief returns key code if key of keyboard was pressed
+  /// \return key code
+  int KbHit()
+  {
+    static const int STDIN = 0;
+    static bool initialized = false;
+
+    if (!initialized) {
+      termios term;
+      tcgetattr(STDIN, &term);
+      term.c_lflag &= ~ICANON;
+      tcsetattr(STDIN, TCSANOW, &term);
+      setbuf(stdin, NULL);
+      initialized = true;
+    }
+
+    int bytes_waiting;
+    ioctl(STDIN, FIONREAD, &bytes_waiting);
+    return bytes_waiting;
+  }
 
 int main(int argc, char* argv[])
 {

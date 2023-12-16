@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 #include <initializer_list>
 
 #define TOPIC_STATE      	"State"
@@ -16,5 +15,5 @@ public:
     ~Client();
 
     bool IsFinished();
-    void Publish(const std::string_view topic, const std::string_view msg);
+    void Publish(const std::string& topic, const std::string& msg);
 };
