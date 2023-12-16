@@ -9,6 +9,8 @@ void onSubscribe(void*, MQTTAsync_successData*);
 void onSubscribeFailure(void*, MQTTAsync_failureData* response);
 int msgArrvd(void*, char* topicName, int topicLen, MQTTAsync_message* message);
 
+void (*setState)(int);
+
 namespace 
 {
     #define ADDRESS     "tcp://mqtt.eclipseprojects.io:1883"
@@ -113,7 +115,6 @@ Client::Client(initializer_list<std::string> subscr)
 		usleep(TIMEOUT);
 	}    
 }
-
 
 bool Client::IsFinished()
 {

@@ -25,7 +25,7 @@ void PrintCurrAutomatState(shared_ptr<Automat> a)
 
   /// \brief returns key code if key of keyboard was pressed
   /// \return key code
-  int KbHit()
+  bool KbHitQ()
   {
     static const int STDIN = 0;
     static bool initialized = false;
@@ -41,7 +41,7 @@ void PrintCurrAutomatState(shared_ptr<Automat> a)
 
     int bytes_waiting;
     ioctl(STDIN, FIONREAD, &bytes_waiting);
-    return bytes_waiting;
+	return (bytes_waiting == 'q' || bytes_waiting == 'Q');
   }
 
 int main(int argc, char* argv[])
@@ -62,8 +62,7 @@ int main(int argc, char* argv[])
 	int ch;
 	do
 	{
-		ch = getchar();
-	} while (ch!='Q' && ch != 'q');
+	} while (!KbHitQ());
 
  	return 0;
 }
