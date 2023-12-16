@@ -4,9 +4,9 @@
 
 using namespace std;
 
-extern void onSubscribe(void*, MQTTAsync_successData*);
-extern void onSubscribeFailure(void*, MQTTAsync_failureData* response);
-extern int msgArrvd(void*, char* topicName, int topicLen, MQTTAsync_message* message);
+void onSubscribe(void*, MQTTAsync_successData*);
+void onSubscribeFailure(void*, MQTTAsync_failureData* response);
+int msgArrvd(void*, char* topicName, int topicLen, MQTTAsync_message* message);
 
 namespace 
 {
@@ -161,13 +161,60 @@ Client::~Client()
     }
 }
 
-void* Client::GetClient()
+/// Subscription
+
+void onSubscribe(void*, MQTTAsync_successData*)
 {
-    return client;
+	printf("Subscribe succeeded\n");
+	subscribed = 1;
 }
 
-int Client::GetQOS()
+void onSubscribeFailure(void*, MQTTAsync_failureData* response)
 {
-    return QOS;
+	printf("Subscribe failed, rc %d\n", response->code);
 }
+
+int msgArrvd(void*, char* topicName, int topicLen, MQTTAsync_message* message)
+{
+    printf("Message arrived\n");
+    printf("   topic: %s\n", topicName);
+    printf("   message: %.*s\n", message->payloadlen, (char*)message->payload);
+    MQTTAsync_freeMessage(&message);
+    MQTTAsync_free(topicName);
+    return 1;
+}
+
+/// Publishing
+
+void onSendFailure(void* context, MQTTAsync_failureData* response)
+{
+	printf("Message send failed token %d error code %d\n", response->token, response->code);
+}
+
+void onSend(void* context, MQTTAsync_successData* response)
+{
+	printf("Message with token value %d delivery confirmed\n", response->token);
+}
+
+void Client::Publish(const std::string_view topic, const std::string_view msg)
+{
+	MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
+	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
+
+	opts.onSuccess = onSend;
+	opts.onFailure = onSendFailure;
+	opts.context = client;
+	pubmsg.qos = QOS;
+	pubmsg.retained = 0;
+	pubmsg.payload = (void*)msg.data();
+	pubmsg.payloadlen = (int)msg.length();
+	int rc{};
+	if ((rc = MQTTAsync_sendMessage(client, topic.data(), &pubmsg, &opts)) != MQTTASYNC_SUCCESS)
+	{
+		printf("Failed to start sendMessage, return code %d\n", rc);
+		throw false;
+	}
+	printf("Waiting for publication on topic %s\n", topic);			
+}
+
 

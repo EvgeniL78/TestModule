@@ -8,14 +8,10 @@
 #include <OsWrapper.h>
 #endif
 
-#define TOPIC_STATE      	"State"
-#define TOPIC_GO_TO_STATE	"GoToState"
-#define TOPIC_TIME_ELAPSED	"TimeElapsed"
-#define TOPIC_TIME			"Time"
+
 
 int main(int argc, char* argv[])
 {
-	Client client({TOPIC_STATE, TOPIC_GO_TO_STATE});
 
 	while (!subscribed && !finished)
 	{
