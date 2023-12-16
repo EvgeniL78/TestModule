@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <initializer_list>
 
 #define TOPIC_STATE      	"State"

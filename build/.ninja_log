@@ -1,5 +1,5 @@
 # ninja log v5
-0	49	1702642947304936076	CMakeFiles/TestModule.dir/main.cpp.o	9e43256128db1b7e
-49	99	1702642947352934500	TestModule	9ebf6913ff6818be
-1	443	1702730450259586187	CMakeFiles/TestModule.dir/main.cpp.o	9e43256128db1b7e
-1	411	1702730675385911936	CMakeFiles/TestModule.dir/main.cpp.o	9e43256128db1b7e
+0	241	1702749519013437314	CMakeFiles/TestModule.dir/client.cpp.o	bf44a734dc35e024
+1	163	1702749751566772617	CMakeFiles/TestModule.dir/automat.cpp.o	e18f7d4986069d7
+0	580	1702750711199548790	CMakeFiles/TestModule.dir/main.cpp.o	9e43256128db1b7e
+304	359	1702749751762786103	TestModule	40d53ff2771efe95
