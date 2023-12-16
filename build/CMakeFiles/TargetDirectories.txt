@@ -1,5 +1,0 @@
-/home/evgeni/Work2/TestModule/build/CMakeFiles/TestModule.dir
-/home/evgeni/Work2/TestModule/build/CMakeFiles/package.dir
-/home/evgeni/Work2/TestModule/build/CMakeFiles/package_source.dir
-/home/evgeni/Work2/TestModule/build/CMakeFiles/edit_cache.dir
-/home/evgeni/Work2/TestModule/build/CMakeFiles/rebuild_cache.dir
