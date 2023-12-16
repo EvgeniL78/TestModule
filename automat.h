@@ -1,59 +1,37 @@
 #pragma once
 
 #include <string>
-#include "client.h"
-
-enum class EAutoState
-{
-    none = -1,
-    start = 0, // connection to broker
-    end = 1, // disconnect from broker
-    two,
-    three
-};
 
 #define AUTOMAT_STATE_BEGIN 0
 #define AUTOMAT_STATE_END   1
 #define AUTOMAT_STATE_2     2
-
-class AutomatStart;
+#define AUTOMAT_STATE_3     3
 
 class Automat
 {
 public:
-    Automat(int s)
-    : state_(s)
-    {}
-    virtual ~Automat() {}
+    Automat(){}
 
-    int GetState() { return state_; }
-    void SetState(int s)
-    {
-        state_ = s;
-        
-        switch(state_)
-        {
-            case AUTOMAT_STATE_BEGIN:
-             break;
-
-            case AUTOMAT_STATE_END:
-             delete this;
-             return;
-
-            case AUTOMAT_STATE_2:
-            default:
-             break;
-        }
-    }
-
-private:
-    int state_ = -1;
-    Client* client_ = nullptr;
+    virtual bool IsWorking() { return true; }
+    virtual std::string GetStateMsg() = 0;
 };
 
-class AutomatStart : public Automat
+class AutomatStart: public Automat
 {
 public:
     AutomatStart();
-    ~AutomatStart();
+    virtual bool IsWorking() override;
+    virtual std::string GetStateMsg() override;
+};
+
+class AutomatState2: public Automat
+{
+public:
+    virtual std::string GetStateMsg() override { return "AutomatState2"; };
+};
+
+class AutomatState3: public Automat
+{
+public:
+    virtual std::string GetStateMsg() override { return "AutomatState3"; };
 };

@@ -1,25 +1,24 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "client.h"
-
 #if defined(_WRS_KERNEL)
 #include <OsWrapper.h>
 #endif
+#include <iostream>
+#include <memory>
 
+#include "automat.h"
 
+using namespace std;
+
+void PrintCurrAutomatState(const unique_ptr<Automat>& a)
+{
+	cout << a->GetStateMsg() << endl;
+}
 
 int main(int argc, char* argv[])
 {
-
-	while (!subscribed && !finished)
-	{
-		usleep(10000L);
-	}
-
-	if (finished)
+	unique_ptr<AutomatStart> automat_start = make_unique<AutomatStart>();
+	if (!automat_start->IsWorking())
 		return 1;
+	PrintCurrAutomatState(dynamic_cast<Automat>(automat_start));
 
 	printf("\nPress Q<Enter> to quit\n\n");
 	int ch;
