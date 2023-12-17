@@ -2,5 +2,6 @@
 
 #include <string>
 
-extern bool KbHitQ();
-extern std::string GetCurrTime();
+extern bool kbHitQ();
+extern std::string getCurrTime();
+extern void runApp(std::string& name);

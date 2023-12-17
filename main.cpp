@@ -29,12 +29,12 @@ shared_ptr<Automat> currAuto = autoStates[AUTOMAT_STATE_BEGIN];
 
 bool endOfWork = false;
 
-void PrintCurrAutomatState()
+void printCurrAutomatState()
 {
 	cout << currAuto->GetStateMsg() << endl;
 }
 
-void SetAutomatToState(const char* topic, int to_state)
+void setAutomatToState(const char* topic, int to_state)
 {
   string t(topic);
   if (!t.compare(TOPIC_STATE) || 
@@ -53,7 +53,7 @@ void SetAutomatToState(const char* topic, int to_state)
     }
    
     currAuto = autoStates[to_state];
-    PrintCurrAutomatState();
+    printCurrAutomatState();
 
     if (to_state == AUTOMAT_STATE_END)
       endOfWork = true;
@@ -62,9 +62,15 @@ void SetAutomatToState(const char* topic, int to_state)
 
 int main(int argc, char* argv[])
 {	
-	PrintCurrAutomatState();
+	printCurrAutomatState();
 
-	Client client({TOPIC_STATE, TOPIC_GO_TO_STATE}, SetAutomatToState);
+  // arg parser
+
+  // Mqtt client
+
+	Client client({TOPIC_STATE, TOPIC_GO_TO_STATE}, setAutomatToState);
+
+  // Main thread
 
 	printf("\nPress Q<Enter> to quit\n\n");
 
@@ -82,15 +88,21 @@ int main(int argc, char* argv[])
 
     // publish current time
 
-    msg = GetCurrTime();
+    msg = getCurrTime();
     client.Publish(TOPIC_TIME, msg);
 
     this_thread::sleep_for(timespan);
 	}
   while (
-    !KbHitQ() || // Q
+    !kbHitQ() || // Q
     !endOfWork || // to end state
-    !client.IsFinished()); // client was broken
+    !client.IsFinished()); // client was broke
+
+  if (!endOfWork) // if Q was pressed or client was broke
+  {
+    setAutomatToState(TOPIC_GO_TO_STATE, 1);
+	  printCurrAutomatState();
+  }
 
  	return 0;
 }
