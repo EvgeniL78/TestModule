@@ -18,7 +18,7 @@ void (*setState)(const char*, int);
 namespace 
 {
     #define ADDRESS     "tcp://mqtt.eclipseprojects.io:1883"
-    #define CLIENTID	"ExampleClientSub1"
+    #define CLIENTID	"ExampleClient_main"
 
     #define QOS         1
     #define TIMEOUT     10000L
@@ -45,6 +45,8 @@ void onConnect(void* context, MQTTAsync_successData*)
 {
 	printLog(ELogType::base, "Successful connection");
 
+	// Subscribing init
+
 	MQTTAsync client = (MQTTAsync)context;
 	MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
 
@@ -69,12 +71,13 @@ void onConnect(void* context, MQTTAsync_successData*)
 	}
 	catch (bool& b) {
 		finished = 1;
+		return;
 	}
 }
 
 Client::Client(initializer_list<std::string> subscr, void (*f)(const char*, int))
 {
-    subsrItems = move(subscr);
+    subsrItems = subscr;
 	setState = f;
 
 	MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer;
@@ -82,8 +85,7 @@ Client::Client(initializer_list<std::string> subscr, void (*f)(const char*, int)
     try
     {
         int rc{};
-        if ((rc = MQTTAsync_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL))
-                != MQTTASYNC_SUCCESS)
+        if ((rc = MQTTAsync_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL)) != MQTTASYNC_SUCCESS)
         {
 			printLog(ELogType::base, "Failed to create client, code: " + to_string(rc));
             throw 0;
@@ -226,7 +228,7 @@ void onSend(void* context, MQTTAsync_successData* response)
 	printLog(ELogType::plain, "Message with token value " + to_string(response->token) +" delivery confirmed");
 }
 
-void Client::Publish(const char* topic, const std::string& msg)
+void Client::Publish(const char* topic, const std::string msg)
 {
 	MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
 	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;

@@ -26,8 +26,8 @@ public:
     virtual std::string GetStateMsg() override { return "AutomatState2"; };
 };
 
-class AutomatStateOther: public Automat
+class AutomatStateAnother: public Automat
 {
 public:
-    virtual std::string GetStateMsg() override { return "AutomatStatOther"; };
+    virtual std::string GetStateMsg() override { return "AutomatStateAnother"; };
 };
