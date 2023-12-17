@@ -15,5 +15,5 @@ public:
     ~Client();
 
     bool IsFinished();
-    void Publish(const std::string& topic, const std::string& msg);
+    void Publish(const char* topic, const std::string& msg);
 };

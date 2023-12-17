@@ -5,7 +5,7 @@ add_compile_options(-std=c++17)
 project(TestModule)
 
 set(CMAKE_BUILD_TYPE Debug)
-add_executable(TestModule main.cpp automat.h client.h client.cpp)
+add_executable(TestModule main.cpp automat.h client.h client.cpp service.h service.cpp)
 include_directories(/lib /include)
 target_link_libraries(TestModule libpaho-mqtt3a.so)
 

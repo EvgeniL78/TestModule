@@ -2,12 +2,13 @@
 #include <OsWrapper.h>
 #endif
 #include <iostream>
-#include <unistd.h>
-#include <termios.h>
-#include <sys/ioctl.h>
+#include <string>
+#include <thread>
+#include <chrono>
 #include <memory>
 #include <map>
 
+#include "service.h"
 #include "client.h"
 #include "automat.h"
 
@@ -25,35 +26,15 @@ map<int, shared_ptr<Automat>> autoStates = {
   { AUTOMAT_STATE_OTHER, make_shared<AutomatStateOther>() }
 };
 shared_ptr<Automat> currAuto = autoStates[AUTOMAT_STATE_BEGIN];
+
 bool endOfWork = false;
-
-/// \brief check key code
-/// \return true if keq Q was pressed
-bool KbHitQ()
-{
-  static const int STDIN = 0;
-  static bool initialized = false;
-
-  if (!initialized) {
-    termios term;
-    tcgetattr(STDIN, &term);
-    term.c_lflag &= ~ICANON;
-    tcsetattr(STDIN, TCSANOW, &term);
-    setbuf(stdin, NULL);
-    initialized = true;
-  }
-
-  int bytes_waiting;
-  ioctl(STDIN, FIONREAD, &bytes_waiting);
-  return (bytes_waiting == 'q' || bytes_waiting == 'Q');
-}
 
 void PrintCurrAutomatState()
 {
 	cout << currAuto->GetStateMsg() << endl;
 }
 
-void SetState(const char* topic, int to_state)
+void SetAutomatToState(const char* topic, int to_state)
 {
   string t(topic);
   if (!t.compare(TOPIC_STATE) || 
@@ -83,14 +64,33 @@ int main(int argc, char* argv[])
 {	
 	PrintCurrAutomatState();
 
-	Client client({TOPIC_STATE, TOPIC_GO_TO_STATE}, SetState);
+	Client client({TOPIC_STATE, TOPIC_GO_TO_STATE}, SetAutomatToState);
 
 	printf("\nPress Q<Enter> to quit\n\n");
-	int ch;
+
+  chrono::milliseconds timespan(500);
+  this_thread::sleep_for(timespan);
+  auto begin = std::chrono::high_resolution_clock::now();
+
 	do
 	{
+    // publish time from start
+
+    int64_t fromStart = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - begin).count();
+    string msg = to_string(fromStart);
+    client.Publish(TOPIC_TIME_ELAPSED, msg);
+
+    // publish current time
+
+    msg = GetCurrTime();
+    client.Publish(TOPIC_TIME, msg);
+
+    this_thread::sleep_for(timespan);
 	}
-  while (!KbHitQ() || !endOfWork);
+  while (
+    !KbHitQ() || // Q
+    !endOfWork || // to end state
+    !client.IsFinished()); // client was broken
 
  	return 0;
 }

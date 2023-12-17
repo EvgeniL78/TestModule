@@ -226,7 +226,7 @@ void onSend(void* context, MQTTAsync_successData* response)
 	printf("Message with token value %d delivery confirmed\n", response->token);
 }
 
-void Client::Publish(const std::string& topic, const std::string& msg)
+void Client::Publish(const char* topic, const std::string& msg)
 {
 	MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
 	MQTTAsync_message pubmsg = MQTTAsync_message_initializer;
@@ -239,12 +239,12 @@ void Client::Publish(const std::string& topic, const std::string& msg)
 	pubmsg.payload = (void*)msg.data();
 	pubmsg.payloadlen = (int)msg.length();
 	int rc{};
-	if ((rc = MQTTAsync_sendMessage(client, topic.data(), &pubmsg, &opts)) != MQTTASYNC_SUCCESS)
+	if ((rc = MQTTAsync_sendMessage(client, topic, &pubmsg, &opts)) != MQTTASYNC_SUCCESS)
 	{
 		printf("Failed to start sendMessage, return code %d\n", rc);
 		throw false;
 	}
-	printf("Waiting for publication on topic %s\n", topic.data());			
+	printf("Waiting for publication on topic %s\n", topic);			
 }
 
 
