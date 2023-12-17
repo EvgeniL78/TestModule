@@ -244,7 +244,7 @@ void Client::Publish(const char* topic, const std::string& msg)
 		printLog(ELogType::base, "Failed to start publishing, code: " + to_string(rc));
 		throw false;
 	}
-	printLog(ELogType::plain, "Waiting for publication on topic " + string(topic));
+	printLog(ELogType::plain, "Waiting for publication on topic " + string(topic) + ". Message: " + msg);
 }
 
 

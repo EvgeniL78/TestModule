@@ -105,22 +105,29 @@ int main(int argc, char* argv[])
 
     chrono::milliseconds timespan(500);
     this_thread::sleep_for(timespan);
-    auto begin = std::chrono::high_resolution_clock::now();
+    auto begin = chrono::high_resolution_clock::now();
+    auto dur3sec = chrono::high_resolution_clock::now();
 
     printLog(ELogType::plain, "\nPress Q<Enter> to quit\n");
     AutomatStop* p = nullptr;
     do
     {
-      // publish time from start
+      auto now = chrono::high_resolution_clock::now();
+      if (chrono::duration_cast<chrono::seconds>(now - dur3sec).count() >= 3)
+      {
+        dur3sec = now;
 
-      int64_t fromStart = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - begin).count();
-      string msg = to_string(fromStart);
-      //client.Publish(TOPIC_TIME_ELAPSED, msg);
+        // publish time from start
 
-      // publish current time
+        int64_t fromStart = chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - begin).count();
+        string msg = to_string(fromStart);
+        client.Publish(TOPIC_TIME_ELAPSED, msg);
 
-      msg = getCurrTime();
-      //client.Publish(TOPIC_TIME, msg);
+        // publish current time
+
+        msg = getCurrTime();
+        client.Publish(TOPIC_TIME, msg);
+      }
 
       // checking exit
 
