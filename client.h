@@ -11,7 +11,7 @@
 class Client
 {
 public:
-    Client(std::initializer_list<std::string> subscr);
+    Client(std::initializer_list<std::string> subscr, void (*f)(const char*, int));
     ~Client();
 
     bool IsFinished();

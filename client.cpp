@@ -1,5 +1,6 @@
 #include "client.h"
 #include <unistd.h>
+#include <cstdint>
 #include "include/MQTTAsync.h"
 
 using namespace std;
@@ -9,7 +10,8 @@ void onSubscribe(void*, MQTTAsync_successData*);
 void onSubscribeFailure(void*, MQTTAsync_failureData* response);
 int msgArrvd(void*, char* topicName, int topicLen, MQTTAsync_message* message);
 
-void (*setState)(int);
+/// @brief 
+void (*setState)(const char*, int);
 
 namespace 
 {
@@ -68,9 +70,11 @@ void onConnect(void* context, MQTTAsync_successData*)
 	}
 }
 
-Client::Client(initializer_list<std::string> subscr)
+Client::Client(initializer_list<std::string> subscr, void (*f)(const char*, int))
 {
     subsrItems = move(subscr);
+	setState = f;
+
 	MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer;
 
     try
@@ -197,6 +201,12 @@ int msgArrvd(void*, char* topicName, int topicLen, MQTTAsync_message* message)
     printf("Message arrived\n");
     printf("   topic: %s\n", topicName);
     printf("   message: %.*s\n", message->payloadlen, (char*)message->payload);
+
+	int res{};
+	sscanf((char*)message->payload, "%d", &res);
+	if (setState)
+		setState(topicName, res);
+
     MQTTAsync_freeMessage(&message);
     MQTTAsync_free(topicName);
     return 1;
