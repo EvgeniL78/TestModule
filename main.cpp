@@ -61,10 +61,25 @@ void setAutomatToState(const char* topic, int to_state)
 }
 
 int main(int argc, char* argv[])
-{	
+{
 	printCurrAutomatState();
 
-  // arg parser
+  // Arg parser
+
+  enum { main_thread, stop_automat, just_exit };
+
+  string app;
+  switch (cmdArgsParser(argc, argv, app))
+  {
+    case EArgParams::log_none:
+      break;
+      
+    case EArgParams::run_app:
+      runApp(app);
+    default:
+      throw stop_automat;
+      break;
+  }
 
   // Mqtt client
 

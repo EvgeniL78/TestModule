@@ -1,49 +1,50 @@
+#include <iostream>
 #include <termios.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <chrono>
+#include <filesystem>
 
 #include "service.h"
 
 using namespace std;
+namespace fs = std::filesystem;
+
+namespace
+{
+    EPrintMode printMode = EPrintMode::log_base;
+}
 
 /// \brief parseints of commang line arguments
 /// \param count of agruments
 /// \param parameters of agruments
-int cmdArgsParser(uint argc, char** argv, string& app, int& code)
+EArgParams cmdArgsParser(uint argc, char* argv[], string& app)
 {
-  switch (argc)
-  {
-    case 1:
-      error = ERROR_ARGS_NOT_ENOUGH;
-      break;
+    switch (argc)
+    {
     case 2:
-      if (string(argv[1]) == "-s")
-        flag = EFlags::kServer;
-      else
-        error = ERROR_ARGS_SERVER;
-      break;
+        if (string(argv[1]).compare("-s"))
+            return EArgParams::log_none;
+        break;
 
     case 3:
-      if (string(argv[1]) == "-c") {
-        // Path to files for sending
-
-        string file(argv[2]);
-        if (!fs::exists(file)) {
-          error = ERROR_ARGS_CLIENT;
-          break;
+        if (!string(argv[1]).compare("-d"))
+        {
+            if (!string(argv[2]).compare("0"));
+                return EArgParams::log_base;
+            if (!string(argv[2]).compare("1"));
+                return EArgParams::log_all;
+        }            
+        if (!string(argv[1]).compare("-p"))
+        {
+            app = string(argv[2]);
+            if (fs::exists(app)) 
+                return EArgParams::run_app;
         }
+        break;
+    }
 
-        arg_file = file;
-        flag = EFlags::kClient;
-      }
-      else error = ERROR_ARGS_CLIENT;
-      break;
-
-    default:
-      error = ERROR_ARGS;
-      break;
-  }
+  return EArgParams::error;
 }
 
 /// \brief check key code
@@ -91,4 +92,21 @@ string getCurrTime()
 void runApp(std::string& name)
 {
 
+}
+
+void setPrintMode(EPrintMode m)
+{
+    printMode = m;
+}
+
+void printLog(ELogType t, std::string s)
+{
+    if (printMode == EPrintMode::log_none)
+        return;
+    
+    if (printMode == EPrintMode::log_base &&
+        t == ELogType::plain)
+        return;
+    
+    cout << s << endl;
 }
