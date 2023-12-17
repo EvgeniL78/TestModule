@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <chrono>
 #include <filesystem>
+#include <cstdlib>
 
 #include "service.h"
 
@@ -91,7 +92,7 @@ string getCurrTime()
 
 void runApp(std::string& name)
 {
-
+    system(name.data());
 }
 
 void setPrintMode(EPrintMode m)

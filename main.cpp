@@ -28,33 +28,38 @@ map<int, shared_ptr<Automat>> autoStates = {
 };
 shared_ptr<Automat> currAuto;
 
+/// Cheanges curr automat state
+void setAutomatToState(int to_state)
+{
+  switch(to_state)
+  {
+    case AUTOMAT_STATE_BEGIN:
+    case AUTOMAT_STATE_END:
+    case AUTOMAT_STATE_2:
+      break;
+
+    case AUTOMAT_STATE_OTHER:
+    default:
+      to_state = AUTOMAT_STATE_OTHER;
+      break;
+  }
+  
+  currAuto = autoStates[to_state];
+  printLog(ELogType::plain, currAuto->GetStateMsg());
+}
+
+// Called from mqtt client
 void setAutomatToState(const char* topic, int to_state)
 {
   string t(topic);
   if (!t.compare(TOPIC_STATE) || 
       !t.compare(TOPIC_GO_TO_STATE))
-  {
-    switch(to_state)
-    {
-      case AUTOMAT_STATE_BEGIN:
-      case AUTOMAT_STATE_END:
-      case AUTOMAT_STATE_2:
-        break;
-
-      case AUTOMAT_STATE_OTHER:
-      default:
-        to_state = AUTOMAT_STATE_OTHER;
-        break;
-    }
-   
-    currAuto = autoStates[to_state];
-   	cout << currAuto->GetStateMsg() << endl;
-  }
+    setAutomatToState(to_state);
 }
 
 int main(int argc, char* argv[])
 {
-  setAutomatToState(TOPIC_GO_TO_STATE, AUTOMAT_STATE_BEGIN);
+  setAutomatToState(AUTOMAT_STATE_BEGIN);
 
   // Arg parser
 
@@ -74,7 +79,7 @@ int main(int argc, char* argv[])
       case EArgParams::run_app:
         runApp(app);
       default:
-        setAutomatToState(TOPIC_GO_TO_STATE, AUTOMAT_STATE_END);
+        setAutomatToState(AUTOMAT_STATE_END);
         return 0;
     }
 
@@ -105,7 +110,7 @@ int main(int argc, char* argv[])
       //
 
       if (kbHitQ())
-        setAutomatToState(TOPIC_GO_TO_STATE, AUTOMAT_STATE_END);
+        setAutomatToState(AUTOMAT_STATE_END);
 
       this_thread::sleep_for(timespan);
     }
