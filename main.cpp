@@ -63,7 +63,12 @@ int main(int argc, char* argv[])
 
   // Arg parser
 
-    string app;
+        printLog(ELogType::base, "********************************************");
+          setPrintMode(EPrintMode::log_all);
+        printLog(ELogType::base, "Log mode: all");
+        printLog(ELogType::base, "********************************************");
+
+    /*string app;
     switch (cmdArgsParser(argc, argv, app))
     {
       case EArgParams::log_none:
@@ -71,11 +76,11 @@ int main(int argc, char* argv[])
         break;
       case EArgParams::log_base:
         setPrintMode(EPrintMode::log_base);
-        printLog(ELogType::base, "Log: base mode");
+        printLog(ELogType::base, "Log mode: base");
         break;
       case EArgParams::log_all:
         setPrintMode(EPrintMode::log_all);
-        printLog(ELogType::base, "Log: all mode");
+        printLog(ELogType::base, "Log mode: all");
         break;
 
       case EArgParams::run_app:
@@ -84,9 +89,7 @@ int main(int argc, char* argv[])
       default:
         setAutomatToState(AUTOMAT_STATE_STOP);
         return 0;
-    }
-
-    return 0;
+    }*/
 
     // MQTT client
 
@@ -104,31 +107,34 @@ int main(int argc, char* argv[])
     this_thread::sleep_for(timespan);
     auto begin = std::chrono::high_resolution_clock::now();
 
-    printLog(ELogType::plain, "\nPress Q<Enter> to quit\n\n");
+    printLog(ELogType::plain, "\nPress Q<Enter> to quit\n");
+    AutomatStop* p = nullptr;
     do
     {
       // publish time from start
 
       int64_t fromStart = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - begin).count();
       string msg = to_string(fromStart);
-      client.Publish(TOPIC_TIME_ELAPSED, msg);
+      //client.Publish(TOPIC_TIME_ELAPSED, msg);
 
       // publish current time
 
       msg = getCurrTime();
-      client.Publish(TOPIC_TIME, msg);
+      //client.Publish(TOPIC_TIME, msg);
 
-      //
+      // checking exit
 
       if (kbHitQ())
       {
-        printLog(ELogType::plain, "[Q] key was pressed - quit");
+        printLog(ELogType::plain, "\n[Q] key was pressed - quit");
         setAutomatToState(AUTOMAT_STATE_STOP);
       }
 
       this_thread::sleep_for(timespan);
+
+      p = dynamic_cast<AutomatStop*>(currAuto.get());
     }
-    while (is_same_v<decltype(currAuto), AutomatStop>);
+    while (!p);
 
  	return 0;
 }

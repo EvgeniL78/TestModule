@@ -66,7 +66,13 @@ bool kbHitQ()
 
   int bytes_waiting;
   ioctl(STDIN, FIONREAD, &bytes_waiting);
-  return (bytes_waiting == 'q' || bytes_waiting == 'Q');
+  if (bytes_waiting)
+  {
+    char ch{};
+    cin >> ch;
+    return (ch == 'q' || ch == 'Q');
+  }
+  return false;
 }
 
 /// \brief returns timestamp as string (HH:MM:SS)
