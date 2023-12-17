@@ -20,7 +20,7 @@ extern bool kbHitQ();
 // Getiing current time (HH:MM:SS)
 extern std::string getCurrTime();
 
-// Run app in thread
+// Run app
 extern void runApp(std::string& name);
 
 // Print log

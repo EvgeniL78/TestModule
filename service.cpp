@@ -91,7 +91,8 @@ string getCurrTime()
 
 void runApp(std::string& name)
 {
-    system(name.data());
+    int res = system(name.data());
+    printLog(ELogType::base, to_string(res));
 }
 
 void setPrintMode(EPrintMode m)

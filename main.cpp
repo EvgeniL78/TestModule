@@ -28,6 +28,7 @@ map<int, shared_ptr<Automat>> autoStates = {
 };
 shared_ptr<Automat> currAuto;
 
+// Returns current automan state
 int getAutomatState()
 {
   for (const auto&[key, mk_shr_ptr] : autoStates)
@@ -38,7 +39,7 @@ int getAutomatState()
   return -1;
 }
 
-/// Chenges curr automat state
+/// Changes curr automat state
 void setAutomatToState(int to_state)
 {
   auto currState = getAutomatState();

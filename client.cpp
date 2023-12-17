@@ -75,6 +75,7 @@ void onConnect(void* context, MQTTAsync_successData*)
 	}
 }
 
+// Connections to broker
 Client::Client(initializer_list<std::string> subscr, void (*f)(const char*, int))
 {
     subsrItems = subscr;
@@ -133,6 +134,7 @@ bool Client::IsFinished()
 /// Disconnection
 /////////////////////////////
 
+// Reconnects if connection was lost
 void connLost(void*, char* cause)
 {
 	MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer;
@@ -164,6 +166,7 @@ void onDisconnect(void*, MQTTAsync_successData* response)
 	disc_finished = 1;
 }
 
+// Disconnections
 Client::~Client()
 {
     if (client)
