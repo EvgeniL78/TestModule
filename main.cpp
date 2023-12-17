@@ -83,9 +83,15 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    // Mqtt client
+    // MQTT client
 
     Client client({TOPIC_STATE, TOPIC_GO_TO_STATE}, setAutomatToState);
+    if (client.IsFinished())
+    {
+      printLog(ELogType::base, "MQTT client is absent");
+      setAutomatToState(AUTOMAT_STATE_END);
+      return 1;
+    }
 
     // Main thread
 
