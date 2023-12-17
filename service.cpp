@@ -13,7 +13,7 @@ namespace fs = std::filesystem;
 
 namespace
 {
-    EPrintMode printMode = EPrintMode::log_base;
+    EPrintMode printMode = EPrintMode::log_all;
 }
 
 /// \brief parseints of commang line arguments
@@ -76,17 +76,10 @@ string getCurrTime()
     using chrono::system_clock;
     auto currentTime = chrono::system_clock::now();
     char buffer[80]{};
-
-    //auto transformed = currentTime.time_since_epoch().count() / 1000000;
-    //auto millis = transformed % 1000;
-
     time_t tt;
     tt = system_clock::to_time_t (currentTime);
     auto timeinfo = localtime (&tt);
     strftime (buffer, 80, "%H:%M:%S", timeinfo);
-    //char buffer2[100]{};
-    //sprintf(buffer2, "%s:%03d", buffer, (int)millis);
-
     return std::string(buffer);
 }
 

@@ -14,10 +14,10 @@ public:
     virtual std::string GetStateMsg() override { return "AutomatStart"; };
 };
 
-class AutomatEnd: public Automat
+class AutomatStop: public Automat
 {
 public:
-    virtual std::string GetStateMsg() override { return "AutomatEnd"; };
+    virtual std::string GetStateMsg() override { return "AutomatStop"; };
 };
 
 class AutomatState2: public Automat

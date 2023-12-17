@@ -15,14 +15,14 @@
 
 using namespace std;
 
-#define AUTOMAT_STATE_BEGIN 0
-#define AUTOMAT_STATE_END   1
+#define AUTOMAT_STATE_START 0
+#define AUTOMAT_STATE_STOP  1
 #define AUTOMAT_STATE_2     2
 #define AUTOMAT_STATE_OTHER 3
 
 map<int, shared_ptr<Automat>> autoStates = {
-  { AUTOMAT_STATE_BEGIN, make_shared<AutomatStart>() },
-  { AUTOMAT_STATE_END, make_shared<AutomatEnd>() },
+  { AUTOMAT_STATE_START, make_shared<AutomatStart>() },
+  { AUTOMAT_STATE_STOP, make_shared<AutomatStop>() },
   { AUTOMAT_STATE_2, make_shared<AutomatState2>() },
   { AUTOMAT_STATE_OTHER, make_shared<AutomatStateOther>() }
 };
@@ -33,8 +33,8 @@ void setAutomatToState(int to_state)
 {
   switch(to_state)
   {
-    case AUTOMAT_STATE_BEGIN:
-    case AUTOMAT_STATE_END:
+    case AUTOMAT_STATE_START:
+    case AUTOMAT_STATE_STOP:
     case AUTOMAT_STATE_2:
       break;
 
@@ -45,7 +45,7 @@ void setAutomatToState(int to_state)
   }
   
   currAuto = autoStates[to_state];
-  printLog(ELogType::plain, currAuto->GetStateMsg());
+  printLog(ELogType::base, currAuto->GetStateMsg());
 }
 
 // Called from mqtt client
@@ -59,7 +59,7 @@ void setAutomatToState(const char* topic, int to_state)
 
 int main(int argc, char* argv[])
 {
-  setAutomatToState(AUTOMAT_STATE_BEGIN);
+  setAutomatToState(AUTOMAT_STATE_START);
 
   // Arg parser
 
@@ -67,19 +67,23 @@ int main(int argc, char* argv[])
     switch (cmdArgsParser(argc, argv, app))
     {
       case EArgParams::log_none:
+        printLog(ELogType::base, "Log: silent mode");
         setPrintMode(EPrintMode::log_none);
         break;
       case EArgParams::log_base:
+        printLog(ELogType::base, "Log: base mode");
         setPrintMode(EPrintMode::log_base);
         break;
       case EArgParams::log_all:
+        printLog(ELogType::base, "Log: all mode");
         setPrintMode(EPrintMode::log_all);
         break;
 
       case EArgParams::run_app:
+        printLog(ELogType::base, "Run app: " + app);
         runApp(app);
       default:
-        setAutomatToState(AUTOMAT_STATE_END);
+        setAutomatToState(AUTOMAT_STATE_STOP);
         return 0;
     }
 
@@ -89,7 +93,7 @@ int main(int argc, char* argv[])
     if (client.IsFinished())
     {
       printLog(ELogType::base, "MQTT client is absent");
-      setAutomatToState(AUTOMAT_STATE_END);
+      setAutomatToState(AUTOMAT_STATE_STOP);
       return 1;
     }
 
@@ -116,11 +120,14 @@ int main(int argc, char* argv[])
       //
 
       if (kbHitQ())
-        setAutomatToState(AUTOMAT_STATE_END);
+      {
+        printLog(ELogType::plain, "[Q] key was pressed - quit");
+        setAutomatToState(AUTOMAT_STATE_STOP);
+      }
 
       this_thread::sleep_for(timespan);
     }
-    while (is_same_v<decltype(currAuto), AutomatEnd>);
+    while (is_same_v<decltype(currAuto), AutomatStop>);
 
  	return 0;
 }
