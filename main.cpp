@@ -67,16 +67,15 @@ int main(int argc, char* argv[])
     switch (cmdArgsParser(argc, argv, app))
     {
       case EArgParams::log_none:
-        printLog(ELogType::base, "Log: silent mode");
         setPrintMode(EPrintMode::log_none);
         break;
       case EArgParams::log_base:
-        printLog(ELogType::base, "Log: base mode");
         setPrintMode(EPrintMode::log_base);
+        printLog(ELogType::base, "Log: base mode");
         break;
       case EArgParams::log_all:
-        printLog(ELogType::base, "Log: all mode");
         setPrintMode(EPrintMode::log_all);
+        printLog(ELogType::base, "Log: all mode");
         break;
 
       case EArgParams::run_app:
@@ -86,6 +85,8 @@ int main(int argc, char* argv[])
         setAutomatToState(AUTOMAT_STATE_STOP);
         return 0;
     }
+
+    return 0;
 
     // MQTT client
 

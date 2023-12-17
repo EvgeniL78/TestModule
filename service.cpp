@@ -23,26 +23,26 @@ EArgParams cmdArgsParser(uint argc, char* argv[], string& app)
 {
     switch (argc)
     {
-    case 2:
-        if (string(argv[1]).compare("-s"))
-            return EArgParams::log_none;
-        break;
+        case 2:
+            if (!string(argv[1]).compare("-s"))
+                return EArgParams::log_none;
+            break;
 
-    case 3:
-        if (!string(argv[1]).compare("-d"))
-        {
-            if (!string(argv[2]).compare("0"));
-                return EArgParams::log_base;
-            if (!string(argv[2]).compare("1"));
-                return EArgParams::log_all;
-        }            
-        if (!string(argv[1]).compare("-p"))
-        {
-            app = string(argv[2]);
-            if (fs::exists(app)) 
-                return EArgParams::run_app;
-        }
-        break;
+        case 3:
+            if (!string(argv[1]).compare("-d"))
+            {
+                if (!string(argv[2]).compare("0"))
+                    return EArgParams::log_base;
+                if (!string(argv[2]).compare("1"))
+                    return EArgParams::log_all;
+            }            
+            if (!string(argv[1]).compare("-p"))
+            {
+                app = string(argv[2]);
+                if (fs::exists(app)) 
+                    return EArgParams::run_app;
+            }
+            break;
     }
 
   return EArgParams::error;
