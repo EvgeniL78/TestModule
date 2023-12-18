@@ -74,18 +74,16 @@ void setAutomatToState(int to_state)
 }
 
 // Called from mqtt client
-void clientRecived(const char* topic, string msg)
+void clientRecived(string& topic, string& msg)
 {
-  string t(topic);
-
-  if (!t.compare(TOPIC_GO_TO_STATE))
+  if (!topic.compare(TOPIC_GO_TO_STATE))
   {
     int to_state{};
 	  sscanf(msg.data(), "%d", &to_state);
     setAutomatToState(to_state);
   }
 
-  if (!t.compare(TOPIC_GET_TIME))
+  if (!topic.compare(TOPIC_GET_TIME))
     publishTime = true;
 }
 

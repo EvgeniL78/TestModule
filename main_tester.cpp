@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 
     // MQTT client
 
-    Client client(CLIENTID, {TOPIC_STATE, TOPIC_TIME, TOPIC_TIME_ELAPSED}, nullptr);
+    Client client(CLIENTID, {TOPIC_STATE, TOPIC_TIME, TOPIC_TIME_ELAPSED});
     if (client.IsFinished())
     {
       printLog(ELogType::base, "MQTT client failed");

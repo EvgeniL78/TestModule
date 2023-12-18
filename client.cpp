@@ -13,7 +13,7 @@ void connLost(void*, char* cause);
 void onSubscribe(void*, MQTTAsync_successData*);
 void onSubscribeFailure(void*, MQTTAsync_failureData* response);
 int msgArrvd(void*, char* topicName, int topicLen, MQTTAsync_message* message);
-void (*setState)(const char*, string);
+void (*setState)(string&, string&);
 
 namespace 
 {
@@ -75,7 +75,7 @@ void onConnect(void* context, MQTTAsync_successData*)
 }
 
 // Connections to broker
-Client::Client(string client_id, initializer_list<std::string> subscr, void (*f)(const char*, string))
+Client::Client(string client_id, initializer_list<std::string> subscr, void (*f)(string&, string&))
 {
     subsrItems = subscr;
 	setState = f;
@@ -204,11 +204,12 @@ void onSubscribeFailure(void*, MQTTAsync_failureData* response)
 
 int msgArrvd(void*, char* topicName, int topicLen, MQTTAsync_message* message)
 {
+	string topic(topicName);
 	string msg((char*)message->payload);
-	printLog(ELogType::base, "Message arrived. Topic: " + string(topicName) + "; message: " + msg);
+	printLog(ELogType::base, "Message arrived. Topic: " + topic + "; message: " + msg);
 
 	if (setState)
-		setState(topicName, msg);
+		setState(topic, msg);
 
     MQTTAsync_freeMessage(&message);
     MQTTAsync_free(topicName);
