@@ -12,12 +12,12 @@
 #include "client.h"
 #include "automat.h"
 
+#define CLIENTID "ExampleClient_main"
+
 using namespace std;
 
 namespace
 {
-  #define CLIENTID "ExampleClient_main"
-
   #define AUTOMAT_STATE_START 0
   #define AUTOMAT_STATE_STOP  1
   #define AUTOMAT_STATE_2     2

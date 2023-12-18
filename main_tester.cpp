@@ -11,12 +11,10 @@
 #include "service.h"
 #include "client.h"
 
+#define CLIENTID "ExampleClient_tester"
+
 using namespace std;
 
-namespace
-{
-  #define CLIENTID "ExampleClient_tester"
-}
 
 int main(int argc, char* argv[])
 {
