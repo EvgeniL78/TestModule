@@ -1,6 +1,3 @@
-#if defined(_WRS_KERNEL)
-#include <OsWrapper.h>
-#endif
 #include <iostream>
 #include <string>
 #include <thread>
