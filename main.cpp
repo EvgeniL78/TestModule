@@ -14,18 +14,23 @@
 
 using namespace std;
 
-#define AUTOMAT_STATE_START 0
-#define AUTOMAT_STATE_STOP  1
-#define AUTOMAT_STATE_2     2
-#define AUTOMAT_STATE_ANOTHER 3
+namespace
+{
+  #define AUTOMAT_STATE_START 0
+  #define AUTOMAT_STATE_STOP  1
+  #define AUTOMAT_STATE_2     2
+  #define AUTOMAT_STATE_ANOTHER 3
 
-map<int, shared_ptr<Automat>> autoStates = {
-  { AUTOMAT_STATE_START, make_shared<AutomatStart>() },
-  { AUTOMAT_STATE_STOP, make_shared<AutomatStop>() },
-  { AUTOMAT_STATE_2, make_shared<AutomatState2>() },
-  { AUTOMAT_STATE_ANOTHER, make_shared<AutomatStateAnother>() }
-};
-shared_ptr<Automat> currAuto;
+  map<int, shared_ptr<Automat>> autoStates = {
+    { AUTOMAT_STATE_START, make_shared<AutomatStart>() },
+    { AUTOMAT_STATE_STOP, make_shared<AutomatStop>() },
+    { AUTOMAT_STATE_2, make_shared<AutomatState2>() },
+    { AUTOMAT_STATE_ANOTHER, make_shared<AutomatStateAnother>() }
+  };
+  shared_ptr<Automat> currAuto;
+
+  bool publishTime{false};
+}
 
 // Returns current automan state
 int getAutomatState()
@@ -73,9 +78,12 @@ void setAutomatToState(int to_state)
 void setAutomatToState(const char* topic, int to_state)
 {
   string t(topic);
-  if (!t.compare(TOPIC_STATE) || 
-      !t.compare(TOPIC_GO_TO_STATE))
+
+  if (!t.compare(TOPIC_GO_TO_STATE))
     setAutomatToState(to_state);
+
+  if (!t.compare(TOPIC_TIME))
+    publishTime = true;
 }
 
 int waitAppFinished();
@@ -116,7 +124,7 @@ int main(int argc, char* argv[])
 
     // MQTT client
 
-    Client client({TOPIC_STATE, TOPIC_GO_TO_STATE}, setAutomatToState);
+    Client client({TOPIC_TIME, TOPIC_GO_TO_STATE}, setAutomatToState); // list of subscriptions
     if (client.IsFinished())
     {
       printLog(ELogType::base, "MQTT client failed");
@@ -145,7 +153,12 @@ int main(int argc, char* argv[])
         client.Publish(TOPIC_STATE, to_string(getAutomatState())); // state status
         int64_t fromStart = chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - begin).count();
         client.Publish(TOPIC_TIME_ELAPSED, to_string(fromStart)); // time from start
-        client.Publish(TOPIC_TIME, getCurrTime()); // current time
+
+        if (publishTime)
+        {
+          publishTime = false;
+          client.Publish(TOPIC_TIME, getCurrTime()); // current time
+        }
       }
 
       // checking exit
@@ -168,7 +181,7 @@ int main(int argc, char* argv[])
 int waitAppFinished()
 {
   chrono::milliseconds timespan500ms(500);
-  
+
   printLog(ELogType::plain, "\nPress Q<Enter> to quit\n");
   do
   {
