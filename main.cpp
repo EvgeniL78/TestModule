@@ -16,6 +16,8 @@ using namespace std;
 
 namespace
 {
+  #define CLIENTID "ExampleClient_main"
+
   #define AUTOMAT_STATE_START 0
   #define AUTOMAT_STATE_STOP  1
   #define AUTOMAT_STATE_2     2
@@ -128,7 +130,7 @@ int main(int argc, char* argv[])
 
     // MQTT client
 
-    Client client({TOPIC_GET_TIME, TOPIC_GO_TO_STATE}, setAutomatToState); // list of subscriptions
+    Client client(CLIENTID, {TOPIC_GET_TIME, TOPIC_GO_TO_STATE}, setAutomatToState); // list of subscriptions
     if (client.IsFinished())
     {
       printLog(ELogType::base, "MQTT client failed");

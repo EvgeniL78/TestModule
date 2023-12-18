@@ -18,7 +18,6 @@ void (*setState)(const char*, string);
 namespace 
 {
     #define ADDRESS     "tcp://mqtt.eclipseprojects.io:1883"
-    #define CLIENTID	"ExampleClient_main"
 
     #define QOS         1
     #define TIMEOUT     10000L
@@ -76,7 +75,7 @@ void onConnect(void* context, MQTTAsync_successData*)
 }
 
 // Connections to broker
-Client::Client(initializer_list<std::string> subscr, void (*f)(const char*, string))
+Client::Client(string client_id, initializer_list<std::string> subscr, void (*f)(const char*, string))
 {
     subsrItems = subscr;
 	setState = f;
@@ -86,7 +85,7 @@ Client::Client(initializer_list<std::string> subscr, void (*f)(const char*, stri
     try
     {
         int rc{};
-        if ((rc = MQTTAsync_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL)) != MQTTASYNC_SUCCESS)
+        if ((rc = MQTTAsync_create(&client, ADDRESS, client_id.data(), MQTTCLIENT_PERSISTENCE_NONE, NULL)) != MQTTASYNC_SUCCESS)
         {
 			printLog(ELogType::base, "Failed to create client, code: " + to_string(rc));
             throw 0;

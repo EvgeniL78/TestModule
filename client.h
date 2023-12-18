@@ -12,7 +12,7 @@
 class Client
 {
 public:
-    Client(std::initializer_list<std::string> subscr, void (*f)(const char*, std::string));
+    Client(std::string client_id, std::initializer_list<std::string> subscr, void (*f)(const char*, std::string));
     ~Client();
 
     bool IsFinished();
