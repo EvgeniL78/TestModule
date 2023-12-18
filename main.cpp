@@ -75,14 +75,18 @@ void setAutomatToState(int to_state)
 }
 
 // Called from mqtt client
-void setAutomatToState(const char* topic, int to_state)
+void setAutomatToState(const char* topic, string msg)
 {
   string t(topic);
 
   if (!t.compare(TOPIC_GO_TO_STATE))
+  {
+    int to_state{};
+	  sscanf(msg.data(), "%d", &to_state);
     setAutomatToState(to_state);
+  }
 
-  if (!t.compare(TOPIC_TIME))
+  if (!t.compare(TOPIC_GET_TIME))
     publishTime = true;
 }
 
@@ -124,7 +128,7 @@ int main(int argc, char* argv[])
 
     // MQTT client
 
-    Client client({TOPIC_TIME, TOPIC_GO_TO_STATE}, setAutomatToState); // list of subscriptions
+    Client client({TOPIC_GET_TIME, TOPIC_GO_TO_STATE}, setAutomatToState); // list of subscriptions
     if (client.IsFinished())
     {
       printLog(ELogType::base, "MQTT client failed");
