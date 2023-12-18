@@ -12,7 +12,6 @@
 
 using namespace std;
 
-
 int main(int argc, char* argv[])
 {
     setPrintMode(EPrintMode::log_base);

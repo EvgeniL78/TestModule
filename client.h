@@ -3,6 +3,8 @@
 #include <string>
 #include <initializer_list>
 
+/// Topics
+
 #define TOPIC_STATE      	"State"
 #define TOPIC_GO_TO_STATE	"GoToState"
 #define TOPIC_TIME_ELAPSED	"TimeElapsed"

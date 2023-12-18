@@ -7,7 +7,7 @@
 
 using namespace std;
 
-// Call back functions
+/// Call back functions
 
 void connLost(void*, char* cause);
 void onSubscribe(void*, MQTTAsync_successData*);
@@ -15,31 +15,46 @@ void onSubscribeFailure(void*, MQTTAsync_failureData* response);
 int msgArrvd(void*, char* topicName, int topicLen, MQTTAsync_message* message);
 void (*setState)(string&, string&);
 
-namespace 
+namespace
 {
+	/// Broker address
+
     #define ADDRESS     "tcp://mqtt.eclipseprojects.io:1883"
+
+	/// Client init values
 
     #define QOS         1
     #define TIMEOUT     10000L
 
     MQTTAsync client = nullptr;
+
+	/// List of subscribtion topics
+
     initializer_list<std::string> subsrItems;
 
-    int disc_finished = 0;
-    int subscribed = 0;
-    int finished = 0;
+	/// Client flags of working states
+
+    bool disc_finished{false};
+    bool subscribed{false};
+    bool finished{false};
 }
 
 /////////////////////////////
 /// Connection
 /////////////////////////////
 
+/// @brief Call backed if connection failed
+/// @param  
+/// @param response - result
 void onConnectFailure(void*, MQTTAsync_failureData* response)
 {
 	printLog(ELogType::base, "Connect failed, code: " + to_string(response->code));
-	finished = 1;
+	finished = true;
 }
 
+/// @brief Call backed if connection succeeded
+/// @param context - client
+/// @param  
 void onConnect(void* context, MQTTAsync_successData*)
 {
 	printLog(ELogType::base, "Successful connection");
@@ -69,12 +84,15 @@ void onConnect(void* context, MQTTAsync_successData*)
 		    subscr(i);
 	}
 	catch (bool& b) {
-		finished = 1;
+		finished = true;
 		return;
 	}
 }
 
-// Connections to broker
+/// @brief Connects to broker
+/// @param client_id - client id
+/// @param subscr - topics for subscription
+/// @param f - call back func pointer; func will be called after client receives message from broker
 Client::Client(string client_id, initializer_list<std::string> subscr, void (*f)(string&, string&))
 {
     subsrItems = subscr;
@@ -124,16 +142,20 @@ Client::Client(string client_id, initializer_list<std::string> subscr, void (*f)
 	}    
 }
 
+/// @brief Checks if client stopped
+/// @return true - client stopped
 bool Client::IsFinished()
 {
-    return (finished == 1);
+    return (finished == true);
 }
 
 /////////////////////////////
 /// Disconnection
 /////////////////////////////
 
-// Reconnects if connection was lost
+/// @brief Reconnects if connection was lost
+/// @param  
+/// @param cause - reason
 void connLost(void*, char* cause)
 {
 	MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer;
@@ -149,23 +171,29 @@ void connLost(void*, char* cause)
 	if ((rc = MQTTAsync_connect(client, &conn_opts)) != MQTTASYNC_SUCCESS)
 	{
 		printLog(ELogType::base, "Failed to start connect, code: " + to_string(rc));
-		finished = 1;
+		finished = true;
 	}
 }
 
+/// @brief Call backed if disconnection failed
+/// @param  
+/// @param response - reason
 void onDisconnectFailure(void*, MQTTAsync_failureData* response)
 {
 	printLog(ELogType::plain, "Disconnect failed, code: " + to_string(response->code));
-	disc_finished = 1;
+	disc_finished = true;
 }
 
+/// @brief Call backed if disconnection succeeded
+/// @param  
+/// @param response - reason
 void onDisconnect(void*, MQTTAsync_successData* response)
 {
 	printLog(ELogType::plain, "Successful disconnection");
-	disc_finished = 1;
+	disc_finished = true;
 }
 
-// Disconnections
+/// @brief Disconnects from broker
 Client::~Client()
 {
     if (client)
@@ -191,17 +219,29 @@ Client::~Client()
 /// Subscription
 /////////////////////////////
 
+/// @brief Call backed if subscription succeeded
+/// @param  
+/// @param  
 void onSubscribe(void*, MQTTAsync_successData*)
 {
 	printLog(ELogType::plain, "Subscribe succeeded");
-	subscribed = 1;
+	subscribed = true;
 }
 
+/// @brief Call backed if subscription failed
+/// @param  
+/// @param response - reason
 void onSubscribeFailure(void*, MQTTAsync_failureData* response)
 {
 	printLog(ELogType::base, "Subscribe failed, code: " + to_string(response->code));
 }
 
+/// @brief Call backed when message was received from broker
+/// @param  
+/// @param topicName - topic name
+/// @param topicLen - topic string length
+/// @param message - message info
+/// @return result
 int msgArrvd(void*, char* topicName, int topicLen, MQTTAsync_message* message)
 {
 	string topic(topicName);
@@ -220,16 +260,25 @@ int msgArrvd(void*, char* topicName, int topicLen, MQTTAsync_message* message)
 /// Publishing
 /////////////////////////////
 
-void onSendFailure(void* context, MQTTAsync_failureData* response)
+/// @brief Call backed if sending failed
+/// @param  
+/// @param response - reason
+void onSendFailure(void*, MQTTAsync_failureData* response)
 {
 	printLog(ELogType::base, "Message send failed token " + to_string(response->token) +" error code " + to_string(response->code));
 }
 
-void onSend(void* context, MQTTAsync_successData* response)
+/// @brief Call backed if sending successed
+/// @param  
+/// @param response - reason
+void onSend(void*, MQTTAsync_successData* response)
 {
 	printLog(ELogType::plain, "Message with token value " + to_string(response->token) +" delivery confirmed");
 }
 
+/// @brief Publishes message to topic
+/// @param topic 
+/// @param msg - message
 void Client::Publish(const char* topic, const std::string msg)
 {
 	MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;

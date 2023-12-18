@@ -15,14 +15,18 @@ namespace fs = std::filesystem;
 
 namespace
 {
+    /// Mode of writing messages to console
     EPrintMode printMode = EPrintMode::log_all;
 
+    /// Results of running another app in other thread
     atomic_int appRes(-1);
 }
 
-/// \brief parseints of commang line arguments
-/// \param count of agruments
-/// \param parameters of agruments
+/// @brief Parseints of commang line arguments
+/// @param count of agruments
+/// @param parameters of agruments
+/// @param app - application for running
+/// @return type of act for curr app
 EArgParams cmdArgsParser(uint argc, char* argv[], string& app)
 {
     switch (argc)
@@ -52,8 +56,8 @@ EArgParams cmdArgsParser(uint argc, char* argv[], string& app)
   return EArgParams::error;
 }
 
-/// \brief check key code
-/// \return true if keq Q was pressed
+/// @brief Checks key code
+/// @return true if keq Q was pressed
 bool kbHitQ()
 {
   static const int STDIN = 0;
@@ -79,8 +83,8 @@ bool kbHitQ()
   return false;
 }
 
-/// \brief returns timestamp as string (HH:MM:SS)
-/// \return timestamp
+/// @brief returns timestamp as string (HH:MM:SS)
+/// @return timestamp
 string getCurrTime()
 {
     using chrono::system_clock;
@@ -93,6 +97,8 @@ string getCurrTime()
     return std::string(buffer);
 }
 
+/// @brief Runs another app in thread
+/// @name file name
 void runApp(std::string& name)
 {
     thread th([name] {
@@ -102,16 +108,23 @@ void runApp(std::string& name)
     th.detach();
 }
 
+/// @brief Checks if another app is working or not
+/// @return - true is app finished
 bool appFinished()
 {
     return (appRes.load() > -1);
 }
 
+/// @brief Sets mode for writing log messages to console
+/// @param m - mode
 void setPrintMode(EPrintMode m)
 {
     printMode = m;
 }
 
+/// @brief Writes msg to console
+/// @param t - msg type
+/// @param s - msg
 void printLog(ELogType t, std::string s)
 {
     if (printMode == EPrintMode::log_none)

@@ -15,10 +15,14 @@ using namespace std;
 
 namespace
 {
+  /// Automat states
+
   #define AUTOMAT_STATE_START 0
   #define AUTOMAT_STATE_STOP  1
   #define AUTOMAT_STATE_2     2
   #define AUTOMAT_STATE_ANOTHER 3
+
+  /// Automat state objects
 
   map<int, shared_ptr<Automat>> autoStates = {
     { AUTOMAT_STATE_START, make_shared<AutomatStart>() },
@@ -26,12 +30,15 @@ namespace
     { AUTOMAT_STATE_2, make_shared<AutomatState2>() },
     { AUTOMAT_STATE_ANOTHER, make_shared<AutomatStateAnother>() }
   };
+  /// Current working automat
   shared_ptr<Automat> currAuto;
 
+  /// Publish timestamp by another client request
   bool publishTime{false};
 }
 
-// Returns current automan state
+/// @brief Returns current automan state
+/// @return state
 int getAutomatState()
 {
   for (const auto&[key, mk_shr_ptr] : autoStates)
@@ -42,7 +49,8 @@ int getAutomatState()
   return -1;
 }
 
-/// Changes curr automat state
+/// @brief Changes curr automat state
+/// @param to_state - new state 
 void setAutomatToState(int to_state)
 {
   auto currState = getAutomatState();
@@ -73,7 +81,9 @@ void setAutomatToState(int to_state)
   printLog(ELogType::base, currAuto->GetStateMsg());
 }
 
-// Called from mqtt client
+/// @brief Called from mqtt client
+/// @param topic - topic name
+/// @param msg - message from another client
 void clientRecived(string& topic, string& msg)
 {
   if (!topic.compare(TOPIC_GO_TO_STATE))
@@ -87,7 +97,30 @@ void clientRecived(string& topic, string& msg)
     publishTime = true;
 }
 
-int waitAppFinished();
+/// @brief When only another app will be run
+/// @return exit app code
+int waitAppFinished()
+{
+  chrono::milliseconds timespan500ms(500);
+
+  printLog(ELogType::plain, "\nPress Q<Enter> to quit\n");
+  do
+  {
+    if (appFinished())
+      break;
+
+    if (kbHitQ())
+    {
+      printLog(ELogType::plain, "\n[Q] key was pressed - quit");
+      return 1;
+    }
+
+    this_thread::sleep_for(timespan500ms);
+  }
+  while (true);
+  
+  return 0;
+}
 
 int main(int argc, char* argv[])
 {
@@ -177,27 +210,4 @@ int main(int argc, char* argv[])
     while (!p);
 
  	return 0;
-}
-
-int waitAppFinished()
-{
-  chrono::milliseconds timespan500ms(500);
-
-  printLog(ELogType::plain, "\nPress Q<Enter> to quit\n");
-  do
-  {
-    if (appFinished())
-      break;
-
-    if (kbHitQ())
-    {
-      printLog(ELogType::plain, "\n[Q] key was pressed - quit");
-      return 1;
-    }
-
-    this_thread::sleep_for(timespan500ms);
-  }
-  while (true);
-  
-  return 0;
 }

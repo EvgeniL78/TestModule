@@ -4,6 +4,7 @@
 
 // Command argument parser
 
+/// @brief List of acts after parsing of cmd arg list 
 enum class EArgParams
 {
     error,
@@ -12,15 +13,19 @@ enum class EArgParams
     log_all,
     run_app
 };
+
 extern EArgParams cmdArgsParser(uint argc, char* argv[], std::string& app);
 
-// Pressing the Q key
+// Pressing the keyboard
+
 extern bool kbHitQ();
 
-// Getiing current time (HH:MM:SS)
+// Timestamp
+
 extern std::string getCurrTime();
 
-// Run app
+// Run another app
+
 extern void runApp(std::string& name);
 extern bool appFinished();
 
