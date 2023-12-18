@@ -20,6 +20,9 @@ namespace
 
 int main(int argc, char* argv[])
 {
+    setPrintMode(EPrintMode::log_base);
+    printLog(ELogType::base, "Log mode: base");
+
     // MQTT client
 
     Client client(CLIENTID, {TOPIC_STATE, TOPIC_TIME, TOPIC_TIME_ELAPSED}, nullptr);
