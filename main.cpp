@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 #include <thread>
-#include <mutex>
 #include <chrono>
 #include <memory>
 #include <map>
@@ -70,18 +69,16 @@ void setAutomatToState(int to_state)
   printLog(ELogType::base, currAuto->GetStateMsg());
 }
 
-mutex m;
-
 // Called from mqtt client
 void setAutomatToState(const char* topic, int to_state)
 {
-  lock_guard<mutex> lg(m);
-
   string t(topic);
   if (!t.compare(TOPIC_STATE) || 
       !t.compare(TOPIC_GO_TO_STATE))
     setAutomatToState(to_state);
 }
+
+int waitAppFinished();
 
 int main(int argc, char* argv[])
 {
@@ -90,6 +87,7 @@ int main(int argc, char* argv[])
   // Arg parser
 
     string app;
+
     switch (cmdArgsParser(argc, argv, app))
     {
       case EArgParams::log_none:
@@ -105,8 +103,12 @@ int main(int argc, char* argv[])
         break;
 
       case EArgParams::run_app:
+        setAutomatToState(AUTOMAT_STATE_STOP);
         printLog(ELogType::base, "Run app: " + app);
         runApp(app);
+        return waitAppFinished();
+        break;
+
       default:
         setAutomatToState(AUTOMAT_STATE_STOP);
         return 0;
@@ -161,4 +163,27 @@ int main(int argc, char* argv[])
     while (!p);
 
  	return 0;
+}
+
+int waitAppFinished()
+{
+  chrono::milliseconds timespan500ms(500);
+  
+  printLog(ELogType::plain, "\nPress Q<Enter> to quit\n");
+  do
+  {
+    if (appFinished())
+      break;
+
+    if (kbHitQ())
+    {
+      printLog(ELogType::plain, "\n[Q] key was pressed - quit");
+      return 1;
+    }
+
+    this_thread::sleep_for(timespan500ms);
+  }
+  while (true);
+  
+  return 0;
 }

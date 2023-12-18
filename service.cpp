@@ -5,6 +5,8 @@
 #include <chrono>
 #include <filesystem>
 #include <cstdlib>
+#include <thread>
+#include <atomic>
 
 #include "service.h"
 
@@ -14,6 +16,8 @@ namespace fs = std::filesystem;
 namespace
 {
     EPrintMode printMode = EPrintMode::log_all;
+
+    atomic_int appRes(-1);
 }
 
 /// \brief parseints of commang line arguments
@@ -91,8 +95,16 @@ string getCurrTime()
 
 void runApp(std::string& name)
 {
-    int res = system(name.data());
-    printLog(ELogType::base, to_string(res));
+    thread th([name] {
+            int res = system(name.data());
+            appRes.store(res);
+         });
+    th.detach();
+}
+
+bool appFinished()
+{
+    return (appRes.load() > -1);
 }
 
 void setPrintMode(EPrintMode m)

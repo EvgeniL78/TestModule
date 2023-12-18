@@ -22,6 +22,7 @@ extern std::string getCurrTime();
 
 // Run app
 extern void runApp(std::string& name);
+extern bool appFinished();
 
 // Print log
 

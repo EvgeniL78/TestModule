@@ -251,5 +251,3 @@ void Client::Publish(const char* topic, const std::string msg)
 	}
 	printLog(ELogType::plain, "Waiting for publication on topic " + string(topic) + ". Message: " + msg);
 }
-
-
