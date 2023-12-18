@@ -77,7 +77,7 @@ void setAutomatToState(int to_state)
 }
 
 // Called from mqtt client
-void setAutomatToState(const char* topic, string msg)
+void clientRecived(const char* topic, string msg)
 {
   string t(topic);
 
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 
     // MQTT client
 
-    Client client(CLIENTID, {TOPIC_GET_TIME, TOPIC_GO_TO_STATE}, setAutomatToState); // list of subscriptions
+    Client client(CLIENTID, {TOPIC_GET_TIME, TOPIC_GO_TO_STATE}, clientRecived); // list of subscriptions
     if (client.IsFinished())
     {
       printLog(ELogType::base, "MQTT client failed");
